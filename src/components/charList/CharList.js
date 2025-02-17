@@ -1,8 +1,10 @@
 import { Component } from 'react';
-import './charList.scss';
+
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMassage/ErrorMassage';
 import MarvelServices from '../../services/MarvelServices';
+
+import './charList.scss';
 
 class CharList extends Component {
     state = {
@@ -40,7 +42,8 @@ class CharList extends Component {
   
             return(
                 <li className="char__item"
-                    key={elem.id}>
+                    key={elem.id}
+                    onClick={() => this.props.updateCharSelector(elem.id)}>
                     <img src={elem.thumbnail} alt={elem.name} style={availableImg}/>
                     <div className="char__name">{elem.name}</div>
                 </li>
