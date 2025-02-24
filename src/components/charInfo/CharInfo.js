@@ -1,7 +1,7 @@
 import { Component } from 'react';
 
-import MarvelServices from '../../services/MarvelServices';
-import ErrorMessage from '../errorMassage/ErrorMassage';
+import MarvelService from '../../services/MarvelService';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 import Skeleton from '../skeleton/Skeleton';
 
@@ -15,7 +15,7 @@ class CharInfo extends Component {
         error: false
     }
     
-    marvelServices = new MarvelServices();
+    marvelServices = new MarvelService();
 
     componentDidMount() {
         this.updateChar()

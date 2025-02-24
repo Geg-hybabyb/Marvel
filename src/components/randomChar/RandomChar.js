@@ -1,9 +1,9 @@
 import { Component } from 'react';
 
 import mjolnir from '../../resources/img/mjolnir.png';
-import MarvelServices from '../../services/MarvelServices';
+import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMassage/ErrorMassage';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './randomChar.scss';
 
@@ -14,7 +14,7 @@ class RandomChar extends Component {
         error: false
     }
     
-    marvelServices = new MarvelServices();
+    marvelServices = new MarvelService();
 
     componentDidMount() {
         // this.timerId = setInterval(this.updateChar, 3000)
