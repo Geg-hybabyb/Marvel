@@ -1,5 +1,5 @@
-import { Component } from 'react';
-import PropTypes, { func } from 'prop-types';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -13,9 +13,9 @@ class CharList extends Component {
         loading: true,
         error: false,
         newItemLoading: false,
-        offset: 1546,
-        newItemLoading: true,
-        endList: false
+        offset: 210,
+        endList: false,
+        selectedChar: null
     }
 
     marvelServices = new MarvelService();
@@ -61,14 +61,38 @@ class CharList extends Component {
         })
     }
 
+    setRef = elem => {
+        this.itemRef = elem
+    }
+
+    onClickCharItem = (elem) => {
+        this.props.onCharSelected(elem.id)
+
+        this.onCharSelected(elem.id)
+        this.setRef(elem);
+    }
+
+    onCharSelected = (id) => {
+        this.setState({
+            selectedChar: id
+        })
+    }
+
     renderList = () => {
         const charItem = this.state.charList.map((elem, i) => {
             const availableImg = {objectFit: elem.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg' ? 'unset' : null};
+            let className = 'char__item'
+
+            if(elem.id === this.state.selectedChar) {
+                className += ' char__item_selected'
+            }
 
             return(
-                <li className="char__item"
+                <li className={className}
+                    ref={this.setRef(elem)}
                     key={elem.id}
-                    onClick={() => this.props.onCharSelected(elem.id)}>
+                    tabIndex={0}
+                    onClick={() => this.onClickCharItem(elem)}>
                     <img src={elem.thumbnail} alt={elem.name} style={availableImg}/>
                     <div className="char__name">{elem.name}</div>
                 </li>
@@ -85,7 +109,7 @@ class CharList extends Component {
     render() {
         const {loading, error, offset, newItemLoading, endList} = this.state;
         const charItem = this.renderList()
-
+        
         const load = loading ? <Spinner/> : null;
         const errorMassage = error ? <ErrorMessage/> : null;
         const content = !(load || errorMassage) ? charItem : null;
