@@ -92,7 +92,13 @@ class CharList extends Component {
                     ref={this.setRef(elem)}
                     key={elem.id}
                     tabIndex={0}
-                    onClick={() => this.onClickCharItem(elem)}>
+                    onClick={() => this.onClickCharItem(elem)}
+                    onKeyDown={(e) => {
+                        if(e.key === ' ' || e.key === 'Enter') {
+                            this.onClickCharItem(elem)
+                        }
+                    }}
+                    >
                     <img src={elem.thumbnail} alt={elem.name} style={availableImg}/>
                     <div className="char__name">{elem.name}</div>
                 </li>

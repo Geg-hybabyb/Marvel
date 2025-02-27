@@ -80,6 +80,7 @@ const View = ({char}) => {
 
     let comicsRender = 'there are no comics';
     if(comics.length !== 0) {
+        // eslint-disable-next-line
         comicsRender = comics.map((item, i) => {
             if(i < 10) {
                 return(
