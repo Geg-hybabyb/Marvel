@@ -79,7 +79,7 @@ class CharList extends Component {
     }
 
     renderList = () => {
-        const charItem = this.state.charList.map((elem, i) => {
+        const charItem = this.state.charList.map(elem => {
             const availableImg = {objectFit: elem.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg' ? 'unset' : null};
             let className = 'char__item'
 
