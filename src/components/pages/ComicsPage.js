@@ -1,4 +1,3 @@
-import SingleComic from "../singleComic/SingleComic";
 import ComicsList from "../comicsList/ComicsList";
 import AppBanner from "../appBanner/AppBanner";
 
