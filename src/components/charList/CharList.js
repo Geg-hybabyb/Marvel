@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, createRef } from 'react';
 import PropTypes from 'prop-types';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import useMarvelService from '../../services/MarvelService';
 
 import './charList.scss';
+
+const duration = 700;
 
 const CharList = (props) => {
 
@@ -22,7 +25,7 @@ const CharList = (props) => {
     }, [])
 
     const onRequest = (offset, init) => {
-        init ? setNewItemLoading(true) : setNewItemLoading(false)
+        init ? setNewItemLoading(false) : setNewItemLoading(true)
         getAllCharacters(offset)
             .then(onUpdateList)
     }
@@ -39,48 +42,59 @@ const CharList = (props) => {
         setEndList(ended)
     }
 
-    const itemRef = useRef([])
+    const onClickCharItem = (id, ref) => {
+        props.onCharSelected(id)
 
-    const onClickCharItem = (elem, id) => {
-        props.onCharSelected(elem.id)
-
-        itemRef.current.forEach(item => item.classList.remove('char__item_selected'))
-        itemRef.current[id].classList.add('char__item_selected')
-        itemRef.current[id].focus();
+        ref.current.classList.add('char__item_selected')
+        ref.current.focus();
     }
 
+    const onBlurItem = (ref) => {
+        ref.current.classList.remove('char__item_selected')
+    }
+    
     const renderList = () => {
+        
         const charItem = charList.map((elem, i) => {
             const availableImg = {objectFit: elem.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg' ? 'unset' : null};
+            const ref = createRef(elem)
 
             return(
-                <li className='char__item'
-                    ref={elem => itemRef.current[i] = elem}
-                    key={elem.id}
-                    tabIndex={0}
-                    onClick={() => onClickCharItem(elem, i)}
-                    onKeyDown={(e) => {
-                        if(e.key === ' ' || e.key === 'Enter') {
-                            onClickCharItem(elem, i)
-                        }
-                    }}
-                    >
-                    <img src={elem.thumbnail} alt={elem.name} style={availableImg}/>
-                    <div className="char__name">{elem.name}</div>
-                </li>
+                <CSSTransition
+                timeout={duration} 
+                nodeRef={ref} 
+                key={elem.id}
+                classNames='char__item'>
+                    <li className='char__item'
+                        ref={ref}
+                        tabIndex={0}
+                        onClick={() => onClickCharItem(elem.id, ref)}
+                        onBlur={() => onBlurItem(ref)}
+                        onKeyDown={(e) => {
+                            if(e.key === ' ' || e.key === 'Enter') {
+                                onClickCharItem(elem.id)
+                            }
+                        }}
+                        >
+                        <img src={elem.thumbnail} alt={elem.name} style={availableImg}/>
+                        <div className="char__name">{elem.name}</div>
+                    </li>
+                </CSSTransition>
             )
         });
 
         return(
             <ul className="char__grid">
-                {charItem}
+                <TransitionGroup component={null}>
+                    {charItem}
+                </TransitionGroup>
             </ul>
         )
     }
 
     const charItem = renderList()
     
-    const load = loading && newItemLoading ? <Spinner/> : null;
+    const load = loading && !newItemLoading ? <Spinner/> : null;
     const errorMassage = error ? <ErrorMessage/> : null;
 
     return (
@@ -90,7 +104,7 @@ const CharList = (props) => {
             {charItem}
             <button 
                 className="button button__main button__long"
-                onClick={() => onRequest(offset, true)}
+                onClick={() => onRequest(offset)}
                 style={{'display': endList ? 'none' : 'block'}}
                 disabled={newItemLoading}>
                 <div className="inner">load more</div>
