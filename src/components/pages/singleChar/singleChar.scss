@@ -1,4 +1,4 @@
-@import '../../style/variables.scss';
+@import '../../../style/variables.scss';
 
 .single-comic {
     margin-top: 50px;
@@ -8,7 +8,7 @@
     align-items: start;
     &__img {
         width: 293px;
-        height: 450px;
+        height: 293px;
     }
     &__name {
         font-weight: bold;
@@ -30,6 +30,7 @@
     &__back {
         justify-self: end;
         font-weight: bold;
+        width: 50px;
         font-size: 18px;
         line-height: 24px;
         &:hover {
