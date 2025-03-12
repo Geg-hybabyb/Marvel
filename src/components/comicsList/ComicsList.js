@@ -1,6 +1,6 @@
 import { useState, useEffect, createRef } from 'react';
 import { Link } from 'react-router-dom/cjs/react-router-dom.min';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
@@ -13,7 +13,7 @@ const duration = 700;
 const ComicsList = () => {
 
     const [comicsList, setComicsList] = useState([]);
-    const [offset, setOffset] = useState(210);
+    const [offset, setOffset] = useState(5);
     const [newItemLoading, setNewItemLoading] = useState(false)
     const {loading, error, getAllComics} = useMarvelService();
 
@@ -50,7 +50,7 @@ const ComicsList = () => {
                     <Link to={`/comics/${elem.id}`}>
                         <img src={elem.thumbnail} alt={elem.name} className="comics__item-img"/>
                         <div className="comics__item-name">{elem.name}</div>
-                        <div className="comics__item-price">{elem.price}$</div>
+                        <div className="comics__item-price">{elem.price}</div>
                     </Link>
             </li>
             </CSSTransition>
