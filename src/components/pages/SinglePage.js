@@ -1,46 +1,41 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
 
 import useMarvelService from '../../services/MarvelService';
-import ErrorMessage from '../errorMessage/ErrorMessage';
-import Spinner from '../spinner/Spinner';
+import setComponent from '../../utils/setComponent';
 
 const SinglePage = ({Component, type}) => {
 
     const [data, setData] = useState(null);
     const {id} = useParams()
     
-    const {loading, error, getComic, clearError, getCharacter} = useMarvelService();
+    const {getComic, clearError, getCharacter, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         updateComponent()
          // eslint-disable-next-line
     }, [id])
 
-    const updateComponent = useCallback(() => {
+    const updateComponent = () => {
         clearError()
 
         switch(type){
             case 'character':
                 getCharacter(id)
-                    .then(setData)
-            break;
+                    .then(setData).then(() => setProcess('confirm'))
+                break;
             case 'comics':
                 getComic(id)
-                    .then(setData)
+                    .then(setData).then(() => setProcess('confirm'))
+                break;
+            default:
+                return;
         }
-             // eslint-disable-next-line
-    }, [id])
-
-    const errorMessagrs = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error || !data) ? <Component data={data}/> : null;
+    }
 
     return (
         <div className="single-comic">
-           {errorMessagrs}
-           {spinner}
-           {content}
+            {setComponent(process, Component, data)}
         </div>
     )
 }

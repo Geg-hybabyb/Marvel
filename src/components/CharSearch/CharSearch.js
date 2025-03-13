@@ -12,18 +12,19 @@ const CharSearch = () => {
 
     const [char, setChar] = useState(null)
 
-    const {loading, error, getCharacterByName} = useMarvelService()
+    const {getCharacterByName, process, setProcess} = useMarvelService()
 
     const onRequest = (name) => {
         getCharacterByName(name)
             .then(setState)
+            .then(() => setProcess('confirm'))
     }
 
     const setState = (char) => {
         setChar(char);
     }
 
-    const massage = error ? <ErrorMessage/> : null
+    const massage = process === 'error' ? <ErrorMessage/> : null
     const results = !char ? null : char.length > 0 ?
         <div className='char__found'>
             <p className='q'>There is! Visit {char[0].name} page?</p>
@@ -49,7 +50,7 @@ const CharSearch = () => {
                 <Field className='form__input' placeholder='Enter name' name='name' id="name" type="text" />
                     <button type="submit"
                         className="button button__main"
-                        disabled={loading}>
+                        disabled={process === 'loading'}>
                         <div className="inner">find</div>
                     </button>
                 <FormikErrorMassage name='name' component='div' className='error' />

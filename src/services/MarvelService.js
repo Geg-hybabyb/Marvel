@@ -5,7 +5,7 @@ const useMarvelService = () => {
     const _apiKey = 'apikey=c5d6fc8b83116d92ed468ce36bac6c62';
     const _baseOffset = 210;
 
-    const {loading, error, request, clearError} = useHttp();
+    const {loading, error, request, clearError, process, setProcess} = useHttp();
 
     const getAllCharacters = async (offset = _baseOffset) => {
         const res = await request(`${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`);
@@ -51,12 +51,23 @@ const useMarvelService = () => {
             name: comics.title,
             price: comics.prices[0].price ? `${comics.prices[0].price}$` : 'not available',
             pageCount: comics.pageCount,
-            description: comics.description,
+            description: comics.description ? comics.description : 'There is no description for this comic',
             language: comics.textObjects[0]?.language || "en-us"
         }
     } 
 
-    return {loading, error, clearError, getAllCharacters, getCharacterByName, getCharacter, getAllComics, getComic}
+    return {
+        process,
+        setProcess,
+        loading,
+        error,
+        clearError,
+        getAllCharacters,
+        getCharacterByName,
+        getCharacter,
+        getAllComics, 
+        getComic
+    }
 }
 
 export default useMarvelService;

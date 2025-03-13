@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { Helmet } from "react-helmet";
 
 import './singleChar.scss'
@@ -21,7 +20,6 @@ const SingleChar = ({data}) => {
                 <h2 className="single-char__name">{name}</h2>
                 <p className="single-char__descr">{description}</p>
             </div>
-            <Link to='/' className="single-char__back">Back to all</Link>
         </div>
     )
 }

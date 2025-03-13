@@ -1,14 +1,26 @@
-import React, { useState, useEffect, createRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import useMarvelService from '../../services/MarvelService';
 
 import './charList.scss';
 
-const duration = 700;
+const setComponent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>
+        case 'loading':
+            return !newItemLoading ? <Spinner/> : <Component/>
+        case 'confirm':
+            return <Component/>
+        case 'error':
+            return <ErrorMessage/>
+        default:
+            throw new Error('Unexpected process state')
+    }
+}
 
 const CharList = (props) => {
 
@@ -17,7 +29,7 @@ const CharList = (props) => {
     const [offset, setOffset] = useState(210);
     const [endList, setEndList] = useState(false);
 
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {getAllCharacters, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         onRequest(offset, true);
@@ -28,6 +40,7 @@ const CharList = (props) => {
         init ? setNewItemLoading(false) : setNewItemLoading(true)
         getAllCharacters(offset)
             .then(onUpdateList)
+            .then(() => setProcess('confirm'))
     }
     
     const onUpdateList = (newCharList) => {
@@ -42,69 +55,58 @@ const CharList = (props) => {
         setEndList(ended)
     }
 
-    const onClickCharItem = (id, ref) => {
-        props.onCharSelected(id)
+    const itemRef = useRef([])
 
-        ref.current.classList.add('char__item_selected')
-        ref.current.focus();
+    const onClickCharItem = id => {
+        itemRef.current.forEach(elem => elem.classList.remove('char__item_selected'))
+        itemRef.current[id].classList.add('char__item_selected')
+        itemRef.current[id].focus();
     }
 
-    const onBlurItem = (ref) => {
-        ref.current.classList.remove('char__item_selected')
-    }
-    
     const renderList = () => {
-        
         const charItem = charList.map((elem, i) => {
             const availableImg = {objectFit: elem.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg' ? 'unset' : null};
-            const ref = createRef(elem)
 
             return(
-                <CSSTransition
-                timeout={duration} 
-                nodeRef={ref} 
-                key={elem.id}
-                classNames='char__item'>
-                    <li className='char__item'
-                        ref={ref}
-                        tabIndex={0}
-                        onClick={() => onClickCharItem(elem.id, ref)}
-                        onBlur={() => onBlurItem(ref)}
-                        onKeyDown={(e) => {
-                            if(e.key === ' ' || e.key === 'Enter') {
-                                onClickCharItem(elem.id)
-                            }
-                        }}
-                        >
-                        <img src={elem.thumbnail} alt={elem.name} style={availableImg}/>
-                        <div className="char__name">{elem.name}</div>
-                    </li>
-                </CSSTransition>
+                <li className='char__item'
+                    ref={el => itemRef.current[i] = el}
+                    tabIndex={0}
+                    key={elem.id}
+                    onClick={() => {
+                        onClickCharItem(i)
+                        props.onCharSelected(elem.id)
+                    }}
+                    onKeyDown={(e) => {
+                        if(e.key === ' ' || e.key === 'Enter') {
+                            onClickCharItem(i)
+                            props.onCharSelected(elem.id)
+                        }
+                    }}
+                    >
+                    <img src={elem.thumbnail} alt={elem.name} style={availableImg}/>
+                    <div className="char__name">{elem.name}</div>
+                </li>
             )
         });
 
         return(
             <ul className="char__grid">
-                <TransitionGroup component={null}>
-                    {charItem}
-                </TransitionGroup>
+                {charItem}
             </ul>
         )
     }
 
-    const charItem = renderList()
-    
-    const load = loading && !newItemLoading ? <Spinner/> : null;
-    const errorMassage = error ? <ErrorMessage/> : null;
+    const elements = useMemo(() => {
+        return setComponent(process, () => renderList(), newItemLoading)
+        // eslint-disable-next-line
+    }, [process])
 
     return (
         <div className="char__list">
-            {load}
-            {errorMassage}
-            {charItem}
+            {elements}
             <button 
                 className="button button__main button__long"
-                onClick={() => onRequest(offset)}
+                onClick={() => onRequest(offset, newItemLoading)}
                 style={{'display': endList ? 'none' : 'block'}}
                 disabled={newItemLoading}>
                 <div className="inner">load more</div>
